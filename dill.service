@@ -8,8 +8,6 @@ WorkingDirectory=/root/dill
 ExecStart=/root/dill/start_light.sh --pwdfile /root/dill/walletPw.txt
 Restart=on-failure
 RestartSec=10
-CPUQuota=60%
-MemoryLimit=900M
 
 [Install]
 WantedBy=multi-user.target
