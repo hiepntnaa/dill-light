@@ -9,8 +9,6 @@ WorkingDirectory=/root/dill
 ExecStart=/root/dill/start_light.sh
 Restart=on-failure
 RestartSec=10
-CPUQuota=80%
-MemoryMax=700M
 
 [Install]
 WantedBy=multi-user.target
