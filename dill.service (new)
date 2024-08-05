@@ -1,0 +1,13 @@
+[Unit]
+Description=dill
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/root/dill
+ExecStart=/root/dill/start_light.sh
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
