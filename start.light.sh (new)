@@ -155,6 +155,6 @@ COMMON_FLAGS=" --light --embedded-geth --datadir $DATA_ROOT/beacondata \
 
 echo "start light node"
 
-$PJROOT/$NODE_BIN $COMMON_FLAGS $DISCOVERY_FLAGS $VALIDATOR_FLAGS $PORT_FLAGS > /dev/null &
+$PJROOT/$NODE_BIN $COMMON_FLAGS $DISCOVERY_FLAGS $VALIDATOR_FLAGS $PORT_FLAGS > $LOG_ROOT/dill.log 2>&1 &
 
 echo "start light node done"
