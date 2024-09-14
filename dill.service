@@ -6,7 +6,7 @@ After=network.target
 Type=forking
 User=root
 WorkingDirectory=/root/dill
-ExecStart=/root/dill/start_light.sh
+ExecStart=/root/dill/start_dill_node.sh
 Restart=on-failure
 RestartSec=10
 
