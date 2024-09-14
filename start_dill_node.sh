@@ -79,6 +79,33 @@ if [ -z "$KEY_PWD_FILE" ];then
     fi
 fi
 
+LIGHT_PROC_ROOT=$PJROOT/light_node
+FULL_PROC_ROOT=$PJROOT/full_node
+has_light=0
+has_full=0
+if [ -d $LIGHT_PROC_ROOT ];then
+    has_light=1
+fi
+if [ -d $FULL_PROC_ROOT ];then
+    has_full=1
+fi
+if [ $has_light -eq 1 ] && [ $has_full -eq 1 ]; then
+    echo "Error: Both light_node and full_node directories exist. Please ensure only one of them is present."
+    exit 1
+fi
+if [ $has_light -eq 0 ] && [ $has_full -eq 0 ]; then
+    echo "Error: Neither light_node nor full_node directory exists. Please ensure one of them is present."
+    exit 1
+fi
+
+if [ $has_light -eq 1 ];then
+    PROC_ROOT=$PJROOT/light_node
+else
+    PROC_ROOT=$PJROOT/full_node
+fi
+DATA_ROOT=$PROC_ROOT/data
+LOG_ROOT=$PROC_ROOT/logs
+
 default_port_file="default_ports.txt"
 
 PORT_FLAGS=""
@@ -120,10 +147,6 @@ while read line; do
     ports_used[$port]=1
 done < $default_port_file
 
-PROC_ROOT=$PJROOT/light_node
-DATA_ROOT=$PROC_ROOT/data
-LOG_ROOT=$PROC_ROOT/logs
-
 echo "using password file at $KEY_PWD_FILE"
 
 
@@ -144,17 +167,34 @@ if [ ! -z "$KEY_DIR" ]; then
     VALIDATOR_FLAGS="$VALIDATOR_FLAGS --wallet-dir $KEY_DIR "
 fi
 
-# start light node
-COMMON_FLAGS=" --light --embedded-geth --datadir $DATA_ROOT/beacondata \
---genesis-state $ROOT/genesis.ssz --grpc-gateway-host 0.0.0.0 --initial-validators $ROOT/validators.json \
---block-batch-limit 128 --min-sync-peers 1 --minimum-peers-per-subnet 1 \
---andes --enable-debug-rpc-endpoints \
---suggested-fee-recipient 0x1a5E568E5b26A95526f469E8d9AC6d1C30432B33 \
---log-format json --verbosity error --log-file $LOG_ROOT/dill.log \
---exec-http --exec-http.api eth,net,web3 --exec-gcmode archive --exec-syncmode full --exec-mine=false --accept-terms-of-use "
-
-echo "start light node"
-
-$PJROOT/$NODE_BIN $COMMON_FLAGS $DISCOVERY_FLAGS $VALIDATOR_FLAGS $PORT_FLAGS > $LOG_ROOT/dill.log 2>&1 &
-
-echo "start light node done"
+if [ $has_light -eq 1 ];then
+    # start light node
+    COMMON_FLAGS="--light --datadir $DATA_ROOT/beacondata \
+    --genesis-state $ROOT/genesis.ssz --grpc-gateway-host 0.0.0.0 --initial-validators $ROOT/validators.json \
+    --block-batch-limit 128 --min-sync-peers 1 --minimum-peers-per-subnet 1 \
+    --alps --enable-debug-rpc-endpoints \
+    --suggested-fee-recipient 0x1a5E568E5b26A95526f469E8d9AC6d1C30432B33 \
+    --log-format json --verbosity error --log-file $LOG_ROOT/dill.log \
+    --exec-http --exec-http.api eth,net,web3 --exec-gcmode archive --exec-syncmode full --exec-mine=false --accept-terms-of-use "
+    
+    echo "start light node"
+    
+    nohup $PJROOT/$NODE_BIN $COMMON_FLAGS $DISCOVERY_FLAGS $VALIDATOR_FLAGS $PORT_FLAGS > /dev/null &
+    
+    echo "start light node done"
+else
+    # start full node
+    COMMON_FLAGS=" --datadir $DATA_ROOT/beacondata \
+    --genesis-state $ROOT/genesis.ssz --grpc-gateway-host 0.0.0.0 --initial-validators $ROOT/validators.json \
+    --block-batch-limit 128 --min-sync-peers 1 --minimum-peers-per-subnet 1 \
+    --alps --enable-debug-rpc-endpoints \
+    --suggested-fee-recipient 0x1a5E568E5b26A95526f469E8d9AC6d1C30432B33 \
+    --log-format json --verbosity error --log-file $LOG_ROOT/dill.log \
+    --exec-http --exec-http.api eth,net,web3 --exec-gcmode archive --exec-syncmode full --exec-mine=false --accept-terms-of-use "
+    
+    echo "start full node"
+    
+    $PJROOT/$NODE_BIN $COMMON_FLAGS $DISCOVERY_FLAGS $VALIDATOR_FLAGS $PORT_FLAGS > /dev/null &
+    
+    echo "start full node done"
+fi
