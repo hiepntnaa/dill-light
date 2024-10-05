@@ -179,7 +179,7 @@ if [ $has_light -eq 1 ];then
     
     echo "start light node"
     
-    nohup $PJROOT/$NODE_BIN $COMMON_FLAGS $DISCOVERY_FLAGS $VALIDATOR_FLAGS $PORT_FLAGS > /dev/null &
+    $PJROOT/$NODE_BIN $COMMON_FLAGS $DISCOVERY_FLAGS $VALIDATOR_FLAGS $PORT_FLAGS > /dev/null &
     
     echo "start light node done"
 else
