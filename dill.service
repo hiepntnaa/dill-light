@@ -8,7 +8,7 @@ User=root
 WorkingDirectory=/root/dill
 ExecStart=/root/dill/start_dill_node.sh
 Restart=on-failure
-RestartSec=10
+RestartSec=5
 
 [Install]
 WantedBy=multi-user.target
