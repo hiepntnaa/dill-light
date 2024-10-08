@@ -9,8 +9,8 @@ WorkingDirectory=/root/dill
 ExecStart=/root/dill/start_dill_node.sh
 Restart=on-failure
 RestartSec=5
-MemoryLimit=400M
-MemoryMax=1500M 
+MemoryLimit=600M
+MemoryMax=2000M 
 
 [Install]
 WantedBy=multi-user.target
