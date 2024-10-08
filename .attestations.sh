@@ -36,7 +36,7 @@ DIFF=$((CURRENT_VALUE - LAST_VALUE))
 # Kiem tra muc tang
 if [[ "$DIFF" -ge 0 ]] && [[ "$DIFF" -lt 7 ]]; then
     echo "Mức tăng: $DIFF, restarting dill..."
-#    systemctl restart dill
+    systemctl restart dill
     echo "systemctl restart dill" >> "$LOG_FILE"
 else
     echo "Muc tang: $DIFF"
