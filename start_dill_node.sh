@@ -22,6 +22,16 @@ print_usage(){
 #    print_usage
 #fi
 
+dill_proc=$(ps axu | grep -v grep | grep dill-node | grep alps)
+if [ ! -z "$dill_proc" ];then
+    echo "It seems that there is already a dill node running."
+    echo "Only one dill node allowed in one machine."
+    echo "If you want to launch a new one, you need to stop the currently running dill node."
+    echo ""
+    echo $dill_proc
+    exit 1
+fi
+
 TEMP=$(getopt -o 'k:n:p:' --long 'keydir:,natIP:,pwdfile:' -n 'example.bash' -- "$@")
 if [ $? -ne 0 ]; then
         echo 'Terminating...' >&2
@@ -171,7 +181,7 @@ if [ $has_light -eq 1 ];then
     # start light node
     COMMON_FLAGS="--light --datadir $DATA_ROOT/beacondata \
     --genesis-state $ROOT/genesis.ssz --grpc-gateway-host 0.0.0.0 --initial-validators $ROOT/validators.json \
-    --block-batch-limit 128 --min-sync-peers 1 --minimum-peers-per-subnet 1 \
+    --block-batch-limit 256 --min-sync-peers 1 --minimum-peers-per-subnet 1 \
     --alps --enable-debug-rpc-endpoints \
     --suggested-fee-recipient 0x1a5E568E5b26A95526f469E8d9AC6d1C30432B33 \
     --log-format json --verbosity error --log-file $LOG_ROOT/dill.log \
@@ -179,14 +189,14 @@ if [ $has_light -eq 1 ];then
     
     echo "start light node"
     
-    $PJROOT/$NODE_BIN $COMMON_FLAGS $DISCOVERY_FLAGS $VALIDATOR_FLAGS $PORT_FLAGS > /dev/null &
+    nohup $PJROOT/$NODE_BIN $COMMON_FLAGS $DISCOVERY_FLAGS $VALIDATOR_FLAGS $PORT_FLAGS > /dev/null &
     
     echo "start light node done"
 else
     # start full node
     COMMON_FLAGS=" --datadir $DATA_ROOT/beacondata \
     --genesis-state $ROOT/genesis.ssz --grpc-gateway-host 0.0.0.0 --initial-validators $ROOT/validators.json \
-    --block-batch-limit 128 --min-sync-peers 1 --minimum-peers-per-subnet 1 \
+    --block-batch-limit 256 --min-sync-peers 1 --minimum-peers-per-subnet 1 \
     --alps --enable-debug-rpc-endpoints \
     --suggested-fee-recipient 0x1a5E568E5b26A95526f469E8d9AC6d1C30432B33 \
     --log-format json --verbosity error --log-file $LOG_ROOT/dill.log \
@@ -194,7 +204,7 @@ else
     
     echo "start full node"
     
-    $PJROOT/$NODE_BIN $COMMON_FLAGS $DISCOVERY_FLAGS $VALIDATOR_FLAGS $PORT_FLAGS > /dev/null &
+    nohup $PJROOT/$NODE_BIN $COMMON_FLAGS $DISCOVERY_FLAGS $VALIDATOR_FLAGS $PORT_FLAGS > /dev/null &
     
     echo "start full node done"
 fi
